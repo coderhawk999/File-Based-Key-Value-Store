@@ -2,7 +2,7 @@ const fs = require('fs')
 var sizeof = require('object-sizeof')
 const os = require('os');
 
-var tempPath = os.homedir();
+var tempPath = os.homedir()\;
 
 
 var loadFile = (path)=>{
@@ -29,7 +29,7 @@ var loadFile = (path)=>{
     }
     else
     {
-        console.log(`File path not provided the file will be created in ${tempPath}`)
+        console.log(`File path not provided , file will be created in ${tempPath}`)
     }
 }
 
