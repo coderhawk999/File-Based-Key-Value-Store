@@ -1,0 +1,22 @@
+{
+  "name": "file-based-key-value-store",
+  "version": "1.0.0",
+  "description": "Freshworks-Assignment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coderhawk999/File-Based-Key-Value-Store.git"
+  },
+  "author": "Mohammed Afroz Hussain",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coderhawk999/File-Based-Key-Value-Store/issues"
+  },
+  "homepage": "https://github.com/coderhawk999/File-Based-Key-Value-Store#readme",
+  "dependencies": {
+    "object-sizeof": "^1.6.1"
+  }
+}
