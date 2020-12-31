@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/coderhawk999/File-Based-Key-Value-Store#readme",
   "dependencies": {
-    "object-sizeof": "^1.6.1"
+    "object-sizeof": "^1.6.1",
+    "proper-lockfile": "^4.1.1"
   }
 }

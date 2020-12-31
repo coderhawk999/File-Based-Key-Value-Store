@@ -1,5 +1,6 @@
 const fs = require('fs')
 const os = require('os');
+const lockfile = require('proper-lockfile');
 
 var tempPath = os.homedir()+ '/tmp/data';
 var dir  = os.homedir()+ '/tmp';
@@ -15,7 +16,17 @@ function isEmptyObject(obj) {
   }
 var loadFile = (filePath)=>{
     try {
-        return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+        const filsize = fs.statSync(filePath);
+        const fileSizeInBytes = filsize.size;
+
+        if(fileSizeInBytes>1e+9)
+        {
+            throw new Error("File size exceeded, file size should be less than 1gb")
+        }
+        else
+        {
+            return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+        }
       } catch (err) {
         throw new Error('Invalid file Path or file does not exist ');
       }
@@ -58,7 +69,7 @@ var keyValidation = (key)=>{
     
     if(key == undefined)
     {
-        throw new Error("Key should be Provided, to create a store");
+        throw new Error("Key is Required");
     }
     if(!(typeof key === 'string'))
     {
@@ -67,7 +78,7 @@ var keyValidation = (key)=>{
     if(key.length == 0 || key.length > 32)
     {
         console.log("Key Size :",key.length)
-        throw new Error("Valid Key Should be Provided, Key size should greator than zero or less than 32 characters in size");
+        throw new Error("Invalid Key, Key size should greator than zero or less than 32 characters in size");
     }
 
     return true
@@ -100,7 +111,29 @@ var dataValidation = (data)=>{
 
 var storeData = (filePath,data)=>{
     try {
-        fs.writeFileSync(filePath, JSON.stringify(data))
+        lockfile.check(filePath)
+        .then((isLocked) => {
+           if(!isLocked)
+           {
+            lockfile.lock(filePath)
+            .then((release) => {
+                fs.writeFileSync(filePath, JSON.stringify(data));
+                return release;
+            })
+            .catch((err)=>{
+              throw new Error("Invalid file path, File might have been deleted")  
+            })
+           }
+           else
+           {
+            throw new Error("the data store file is being used another Process")  
+           }
+        })
+        .catch((err)=>{
+            throw new Error("Invalid file path, File might have been deleted")  
+        })
+        ;
+        
       } catch (err) {
         throw new Error("Failed while Saving data, File might have been deleted")
       }
@@ -117,7 +150,33 @@ var Store = function(filePath="")
 
 Store.prototype.read = function(key)
 {
+    // key validation
     keyValidation(key)
+        // Check if key exists
+        if(!(this.data.hasOwnProperty(key)))
+        {
+            throw new Error("Invalid Key, Key does not exist")
+        }
+
+    if(this.data[key][1] !== 0)
+    {
+        // check expiry(time to live)
+
+        const now = new Date().getTime();
+        const key_data = this.data[key];
+
+        if(now > key_data[1])
+        {
+            throw new Error("time-to-live of '"+ key +"' has been expired")
+        }
+    }
+    else
+    {
+        return this.data[key];
+    }    
+    
+
+
 }
 
 Store.prototype.create = function(key = "",data = {},timeToLive = 0){
@@ -135,7 +194,7 @@ Store.prototype.create = function(key = "",data = {},timeToLive = 0){
      // time to live validation
     if(typeof timeToLive!== "number")
     {
-        throw new Error("Titme to live must be a Number in seconds");
+        throw new Error("Time to live must be a Number in seconds");
     }
      if(timeToLive == 0)
      {
@@ -147,11 +206,38 @@ Store.prototype.create = function(key = "",data = {},timeToLive = 0){
          input_val[1] = timeToLive + now.getTime();
      }
      this.data[key] = input_val;
-     storeData(this.filePath,this.data);
+     storeData(this.filePath,this.data)
+}
+
+Store.prototype.delete = function(key){
+     // key validation
+     keyValidation(key)
+     // Check if key exists
+     if(!(this.data.hasOwnProperty(key)))
+     {
+         throw new Error("Invalid Key, Key does not exist")
+     }
+
+    if(this.data[key][1] !== 0)
+    {
+        // check expiry(time to live)
+
+        const now = new Date().getTime();
+        const key_data = this.data[key];
+
+        if(now > key_data[1])
+        {
+            throw new Error("time-to-live of '"+ key +"' has been expired")
+        }
+    }
+    else
+    {
+        delete this.data[key];
+        storeData(this.filePath,this.data)
+    }    
 }
 
 
-var mystore  = new Store();
-
-mystore.create("byebye",{data:"Smthing"},0);
+// var mystore  = new Store();
+// mystore.create("test",{data:"test"},0);
 module.exports  = Store;
