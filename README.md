@@ -43,9 +43,10 @@ const mystore = new Store("/path-to-file");
 
 ### Create functionality
 
-requiredArguments :  .create( **key**(max-length: 32), **JSON-data**, **time-to-live**, **callBack function**(optional) );
+#### `.create( **key**(type : string,max-length: 32), **JSON-data**, **time-to-live**(type: Number), **callBack function**(optional))`
+
 ```js
-mystore.create("key",{dat:"JSON-DATA"},0,()=>{
+mystore.create("key",{dat:"JSON-DATA"},timeToLive,()=>{
     // do operation after creating the data
     console.log(mystore.read("key"))
 });
@@ -58,7 +59,8 @@ mystore.create("key",{dat:"JSON-DATA"},0,()=>{
 
 ### Read functionality
 
-requiredArguments :  .read( **key**(max-length: 32) );
+#### `.read( **key**(type : string,max-length: 32) , **callBack function**(optional))`
+
 ```js
 mystore.read("key") 
 
@@ -71,7 +73,8 @@ mystore.read("key")
 
 ### Delete functionality
 
-requiredArguments :  .read( **key**(max-length: 32) , **callBack function**(optional) );
+#### `.delete( **key**(type : string,max-length: 32) , **callBack function**(optional))`
+
 ```js
 mystore.delete("key",()=>{
     // do operation after deletion
