@@ -59,7 +59,7 @@ mystore.create("key",{dat:"JSON-DATA"},timeToLive,()=>{
 
 ### Read functionality
 
-#### `.read( key**(type : string,max-length: 32) , callBack function(optional))`
+#### `.read( key(type : string,max-length: 32) , callBack function(optional))`
 
 ```js
 mystore.read("key") 
