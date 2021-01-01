@@ -23,6 +23,11 @@ var loadFile = (filePath)=>{
         {
             throw new Error("File size exceeded, file size should be less than 1gb")
         }
+        else if(fileSizeInBytes == 0)
+        {
+            storeData(filePath,{});
+            return {}
+        }
         else
         {
             return JSON.parse(fs.readFileSync(filePath, 'utf8'))
@@ -121,6 +126,7 @@ var storeData = (filePath,data)=>{
                 return release;
             })
             .catch((err)=>{
+                console.log(err)
               throw new Error("Invalid file path, File might have been deleted")  
             })
            }
@@ -183,9 +189,10 @@ Store.prototype.create = function(key = "",data = {},timeToLive = 0){
     // key validation
      keyValidation(key);
         // Check if Key Already Exists
+        console.log(this.data)
         if(this.data.hasOwnProperty(key))
         {
-            throw new Error("Key already Exists")   
+            throw new Error("Error : Key already Exists");
         }
 
      // data validation
